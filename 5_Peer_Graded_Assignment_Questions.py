@@ -1,8 +1,8 @@
 # Import required libraries
 import pandas as pd
 import dash
-from dash import html
-from dash import dcc
+import dash_html_components as html
+import dash_core_components as dcc
 from dash.dependencies import Input, Output, State
 import plotly.graph_objects as go
 import plotly.express as px
@@ -73,12 +73,10 @@ def compute_data_choice_2(df):
 # Application layout
 app.layout = html.Div(children=[html.H1('US Domestic Airline Flights Performance', 
                                 style={'textAlign': 'center', 'color': '#503D36',
-                                'font-size': 24}),
-								
+                                'font-size': 24}), 
                                 # TASK1: Add title to the dashboard
                                 # Enter your code below. Make sure you have correct formatting.
-    
-                                # REVIEW2: Dropdown creation
+                                 # REVIEW2: Dropdown creation
                                 # Create an outer division 
                                 html.Div([
                                     # Add an division
@@ -89,23 +87,18 @@ app.layout = html.Div(children=[html.H1('US Domestic Airline Flights Performance
                                             html.H2('Report Type:', style={'margin-right': '2em'}),
                                             ]
                                         ),
-										
-										
-										dcc.Dropdown(
-                            id='input-type',
-                            options=[
-                                   {'label': 'Yearly Airline Performance Report', 'value': 'OPT1'},
-                                   {'label': 'Yearly Airline Delay Report', 'value': 'OPT2'}
-        ],
-        placeholder='Select a report type',
-        style={'width': '80%','padding': '3px', 'font size': 20, 'text-align-last': 'center', 'display':'flex' })
-       ]),
-    ]),
                                         # TASK2: Add a dropdown
                                         # Enter your code below. Make sure you have correct formatting.
-                                        
+                                        dcc.Dropdown(id='input-type', 
+                                            options=[
+                                                    {'label': 'Yearly Airline Performance Report', 'value': 'OPT1'},
+                                                    {'label': 'Yearly Airline Delay Report', 'value': 'OPT2'}
+                                                    ],
+                                            placeholder='Select a report type',
+                                            style={'width' : "80%", 'padding':'3px', 'font-size':'20px','textAlign': 'center'})
+                               
                                     # Place them next to each other using the division style
-                                    
+                                    ], style={'display':'flex'}),
                                     
                                    # Add next division 
                                    html.Div([
@@ -122,26 +115,29 @@ app.layout = html.Div(children=[html.H1('US Domestic Airline Flights Performance
                                                      style={'width':'80%', 'padding':'3px', 'font-size': '20px', 'text-align-last' : 'center'}),
                                             # Place them next to each other using the division style
                                             ], style={'display': 'flex'}),  
-                                          
+                                          ]),
                                 
                                 # Add Computed graphs
                                 # REVIEW3: Observe how we add an empty division and providing an id that will be updated during callback
                                 html.Div([ ], id='plot1'),
     
                                 html.Div([
-										html.Div([ ], id='plot2'),
-										html.Div([ ], id='plot3'),
-										html.Div([ ], id='plot4'),
-										html.Div([ ], id='plot5')
+                                        html.Div([ ], id='plot2'),
+                                        html.Div([ ], id='plot3'),
                                 ], style={'display': 'flex'}),
                                 
                                 # TASK3: Add a division with two empty divisions inside. See above disvision for example.
                                 # Enter your code below. Make sure you have correct formatting.
-                    
-])      
+                                html.Div([
+                                        html.Div([ ], id='plot4'),
+                                        html.Div([ ], id='plot5'),
+                                ], style={'display': 'flex'}),
+
+                                ])
+
 # Callback function definition
 # TASK4: Add 5 ouput components
-# Enter your code below. Make sure you have correct formatting
+# Enter your code below. Make sure you have correct formatting.
 @app.callback( [Output(component_id='plot1', component_property='children'),
                Output(component_id='plot2', component_property='children'),
                Output(component_id='plot3', component_property='children'),
@@ -150,7 +146,7 @@ app.layout = html.Div(children=[html.H1('US Domestic Airline Flights Performance
                [Input(component_id='input-type', component_property='value'),
                 Input(component_id='input-year', component_property='value')],
                # REVIEW4: Holding output state till user enters all the form information. In this case, it will be chart type and year
-               [State("plot1", "children"), State("plot2", "children"),
+               [State("plot1", 'children'), State("plot2", "children"),
                 State("plot3", "children"), State("plot4", "children"),
                 State("plot5", "children")
                ])
@@ -169,7 +165,8 @@ def get_graph(chart, year, children1, children2, c3, c4, c5):
             
             # TASK5: Average flight time by reporting airline
             # Enter your code below. Make sure you have correct formatting.
-            line_fig = px.line(line_data, x='Month', y='AirTime', color='Reporting_Airline', title='Average monthly flight time minutes by airline')
+            line_fig = px.line(line_data, x='Month', y='AirTime', color='Reporting_Airline ', title='Average monthly flight time (minutes) by airline')
+            
             # Percentage of diverted airport landings per reporting airline
             pie_fig = px.pie(div_data, values='Flights', names='Reporting_Airline', title='% of flights by reporting airline')
             
@@ -187,7 +184,13 @@ def get_graph(chart, year, children1, children2, c3, c4, c5):
             
             # TASK6: Number of flights flying to each state from each reporting airline
             # Enter your code below. Make sure you have correct formatting.
-            tree_fig = px.treemap(tree_data, path=['DestState', 'Reporting_Airline'], values='Flights', color='Flights ', color_continuous_scale='RdBu', title='Flight count by airline to destination state')
+            tree_fig = px.treemap(tree_data, path=['DestState', 'Reporting_Airline'], 
+                      values='Flights',
+                      color='Flights',
+                      color_continuous_scale='RdBu',
+                      title='Flight count by airline to destination state'
+                )
+            
             
             # REVIEW6: Return dcc.Graph component to the empty division
             return [dcc.Graph(figure=tree_fig), 
@@ -212,8 +215,7 @@ def get_graph(chart, year, children1, children2, c3, c4, c5):
                    dcc.Graph(figure=weather_fig), 
                    dcc.Graph(figure=nas_fig), 
                    dcc.Graph(figure=sec_fig), 
-                   dcc.Graph(figure=late_fig)
-                   ]
+                   dcc.Graph(figure=late_fig)]
 
 
 # Run the app
